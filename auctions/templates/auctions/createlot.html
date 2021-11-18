@@ -1,0 +1,76 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Create Lot</h2>
+
+    <!-- -->
+   
+    <!-- -->
+    <br>
+    <div class="container">
+        
+        <div id="con1"> 
+            {% if img_obj %}
+           <img src="{{ img_obj.lot_image.url}}" alt="{{ img_obj.titleimage }}" width="200px" height="296px">
+           {% endif %}
+        </div>
+
+        <div id="con2">
+          <!--  <form action="{% url 'createlot' %}" method="post"> -->
+            <p>
+                <b>Lot name:</b> <input type="text" name="lotname" placeholder="title for lot" form="uploadimg">   
+            </p>
+            <p>
+                <b>Price:</b> <input type="number" name="lotprice" placeholder="$" form="uploadimg">   
+            </p>
+            <p>
+                <b>Description:</b> <input type="text" name="lotdescription" placeholder="description for lot" size="50" form="uploadimg">
+            </p>
+            <p>
+            <h6 id="open">Lot Open</h6>
+            </p>
+            <p>
+                Lot category: 
+                <select name="category" form="uploadimg">
+                    {% for category in categorylot %}
+                    <option value="{{ category.id }}">{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <form id="uploadimg" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                <div class="createlotimage">
+                <div>{{ form.as_p }}</div>  
+                <div id="upload"><!--<button type="submit" form="uploadimg">Upload</button> --></div>
+                </div> 
+                </form> 
+            </p>
+            <p>
+                <input type="hidden" name="userid" value="{{ user.id }}" form="uploadimg">
+            </p>
+        </div>
+       <!-- <button type="submit" form="upload">Upload</button> -->
+        <div id="con3">
+            <p>
+                <button class="btn btn-primary" type="submit" form="uploadimg">Save lot</button>
+            </p>
+
+        </div>
+
+        
+
+    </div>
+    <!-- -->
+  <!--  <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+    {% if img_obj %}
+    <h3>Succesfully uploaded : {{img_obj.titleimage}}</h3>
+    <img src="{{ img_obj.lot_image.url}}" alt="connect" style="max-height:300px">
+    {% endif %}
+-->
+    
+{% endblock %}

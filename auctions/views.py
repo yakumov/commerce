@@ -122,3 +122,42 @@ def viewdetails(request, lot_id):
         "comments": Comment.objects.all().filter(comment_lot_id=lot_id).order_by('-id'),
          "allbid": Bid.objects.all()
     })
+
+
+def createlot(request):
+    #print(f"{Lot.objects.all()}")
+    if request.method == "POST":
+        print(f"requestcrlot={request.POST}")
+        form = LotImageForm(request.POST, request.FILES)
+        lot_name = request.POST["lotname"]
+        lot_price = request.POST["lotprice"]
+        lot_description = request.POST["lotdescription"]
+        lot_categoryid = request.POST["category"]
+        lot_category = LotCategory.objects.get(id=lot_categoryid)
+        lot_authorid = request.POST["userid"]
+        lot_author = User.objects.get(id=lot_authorid)
+        lot_status = True
+        lot_date = datetime.datetime.now()
+        lot_viewimage = form.instance
+        if form.is_valid():
+            form.save()
+            # Get the current instance object to display in the template
+            img_obj = form.instance
+            print(f"imagobj={img_obj}")
+            lot = Lot.objects.create(lot_name=lot_name, lot_price=lot_price, lot_description=lot_description, lot_date=lot_date, lot_status=lot_status, lot_author=lot_author, lot_category=lot_category, lot_viewimage=lot_viewimage)
+            lot.save()
+            current_lot = Lot.objects.get(pk=lot.id)
+            print(f"lotid={current_lot}")
+            return render(request, 'auctions/viewdetails.html', {
+                "currentlot": current_lot,
+                'form': form,
+                'img_obj': img_obj,
+                "categorylot": LotCategory.objects.all()
+                })
+    else:
+        form = LotImageForm()
+    return render(request, 'auctions/createlot.html', {
+        'form': form,
+        "categorylot": LotCategory.objects.all()
+        })
+
