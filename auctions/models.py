@@ -52,3 +52,13 @@ class Watchlist(models.Model):
 
     def __str__(self):
         return f"{self.watch_user} ({self.watch_lot_id})" 
+
+
+class Comment(models.Model):
+    comment_user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    comment_text = models.TextField(null=True, blank=True)
+    comment_date = models.DateTimeField(auto_now=True)
+    comment_lot_id = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.comment_user} [{self.comment_lot_id}] ({self.comment_date}):-> {self.comment_text}" 

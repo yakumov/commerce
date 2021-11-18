@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Bid, LotCategory, User, Lot, LotImage, Watchlist
+from .models import Bid, LotCategory, User, Lot, LotImage, Watchlist, Comment
 from .forms import LotImageForm
 import datetime
 
@@ -246,4 +246,25 @@ def watchlist(request, user_id):
         "userinf": User.objects.all(),
         "categorylot": LotCategory.objects.all(),
         "watchlists": Watchlist.objects.all().filter(watch_user=watchuser).exclude(id=1)
+    })
+
+def closed(request):
+    #print(f"{Lot.objects.all()}")
+    if request.method == "POST" and request.POST['category'] != "1":
+        category = request.POST['category']
+        #print(f"request={request.POST}")
+        #print(f"catr={category}")
+        return render(request, "auctions/closed.html", {
+        "lots": Lot.objects.all().filter(lot_category=category).filter(lot_status=False).order_by('-id'),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all()
+        })
+    else:
+       # print(f"shalom")
+        return render(request, "auctions/closed.html", {
+        "lots": Lot.objects.all().filter(lot_status=False).order_by('-id'),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all()
     })

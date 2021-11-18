@@ -1,0 +1,70 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Closed Listings</h2>
+
+    <form action="" method="post">
+        List Category:
+    {% csrf_token %}
+    <select name="category">
+        {% for category in categorylot %}
+        <option value="{{ category.id }}">{{ category }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Apply">
+    </form>
+
+    {% for lot in lots %}
+    <br>
+    <div class="container">
+        <div id="con1"> 
+            
+            {% if lot.lot_category.category == "smartfon" %}
+            
+            <img src="{{ lot.lot_viewimage.lot_image.url}}" alt="{{ lot.lot_viewimage.titleimage }}" width="200px" height="296px">
+            {% elif lot.lot_category.category == "laptop" %} 
+           
+            <img src="{{ lot.lot_viewimage.lot_image.url}}" alt="{{ lot.lot_viewimage.titleimage }}" width="200px" height="200px">
+            {% else %} 
+
+            <img src="{{ lot.lot_viewimage.lot_image.url}}" alt="{{ lot.lot_viewimage.titleimage }}" width="200px" height="296px">
+           
+            {% endif %}
+            
+        </div>
+        <div id="con2">
+            <h2>
+                {{ lot.lot_name }}   
+            </h2>
+            <p>
+                <b>Price:</b> ${{ lot.lot_price }}
+            </p>
+            <p>
+                <b>Description:</b> {{ lot.lot_description }}
+            </p>
+            <p id="date">
+                <b>Date:</b> {{ lot.lot_date }}
+            </p>
+            <p>
+            {% if lot.lot_status %}
+            <h6 id="open">Lot Open</h6>
+             {% else %}
+            <h6 id="close">Lot Closed</h6>
+            {% endif %}
+            </p>
+            
+            <p>
+                Lot category: {{ lot.lot_category }}
+            </p>
+            </div>
+            <div id="con3">
+            <p>
+                <a class="btn btn-primary" href="{% url 'viewdetails' lot.id %}">View details >> </a>
+            </p>
+
+        </div>
+    </div>
+    
+    {% endfor %}
+    
+{% endblock %}
