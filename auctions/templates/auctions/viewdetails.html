@@ -1,0 +1,176 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <br>
+    <p id="bidmessage"><b>{{ message }}</b></p>
+
+    {% if currentlot.lot_status == False and user.is_authenticated and user.username == currentlot.lot_bid.bid_user.username %}
+        <script>
+        alert("Congratulation You are Win this Lot !");
+        </script>
+    "Congratulation You are Win this Lot !"
+    {% else %}
+    <!-- Empty -->
+    {% endif %}
+
+    <div class="container4">
+    <div class="container3">
+    <div class="container2">
+        <div id="con1"> 
+            {% if currentlot.lot_category.category == "smartfon" %}
+            
+            <img src="{{ currentlot.lot_viewimage.lot_image.url}}" alt="{{ currentlot.lot_viewimage.titleimage }}" width="200px" height="296px">
+            {% elif currentlot.lot_category.category == "laptop" %} 
+             
+            <img src="{{ currentlot.lot_viewimage.lot_image.url}}" alt="{{ currentlot.lot_viewimage.titleimage }}" width="200px" height="200px">
+            {% else %} 
+            <img src="{{ currentlot.lot_viewimage.lot_image.url}}" alt="{{ currentlot.lot_viewimage.titleimage }}" width="200px" height="296px">
+             
+            {% endif %}
+            
+        </div>
+        <div id="con2">
+            <h2>
+                {{ currentlot.lot_name }}   
+            </h2>
+            <p>
+                <b>Price:</b> ${{ currentlot.lot_price }}
+            </p>
+            <p>
+                <b>Description:</b> {{ currentlot.lot_description }}
+            </p>
+            <p class="date">
+                <b>Date:</b> {{ currentlot.lot_date }}
+            </p>
+            <p>
+            {% if currentlot.lot_status %}
+            <h6 id="open">Lot Open</h6>
+             {% else %}
+            <h6 id="close">Lot Closed</h6>
+            {% endif %}
+            </p>
+            <p>
+                {% if not user.is_authenticated %}
+                Lot created by: (hidden) login pls!
+                {% else %}
+                Lot created by: <span id="author">{{ currentlot.lot_author }}</span>
+                {% endif %}
+                
+            </p>
+            <p>
+                Lot category: {{ currentlot.lot_category }}
+            </p>
+            </div>
+            <div id="con3">
+<!-- =============================================================================================================== -->
+                {% if not user.is_authenticated %}
+                    Login for add to watchlist !
+                {% elif currentlot.lot_status == True and user.username == currentlot.lot_author.username %}
+                    <form id="addwatchlist" method="post" action="{% url 'watchlist' user.id %}">
+                    {% csrf_token %}
+                        <input type="hidden" name="userid" value="{{ user.id }}" form="addwatchlist"> 
+                        <input type="hidden" name="currentid" value="{{ currentlot.id }}" form="addwatchlist">   
+                        <p>
+                        <button class="btn btn-primary" type="submit" form="addwatchlist" name="addwatchlist">add to Watchlist >></button>
+                        </p>
+                    </form>
+                    <form id="closedlot" method="post" action="{% url 'viewdetails' currentlot.id %}">
+                        {% csrf_token %}
+                        <p>
+                        <button class="btn btn-primary" type="submit" form="closedlot" name="closedlot">Closed this Lot >></button>
+                        </p>
+                        </form>    
+<!-- =============================================================================================================== -->
+                {% elif currentlot.lot_status == True %}
+                    <form id="addwatchlist" method="post" action="{% url 'watchlist' user.id %}">
+                    {% csrf_token %}
+                        <input type="hidden" name="userid" value="{{ user.id }}" form="addwatchlist"> 
+                        <input type="hidden" name="currentid" value="{{ currentlot.id }}" form="addwatchlist">   
+                    <p>
+                        <button class="btn btn-primary" type="submit" form="addwatchlist" name="addwatchlist">add to Watchlist >></button>
+                    </p>
+                    </form> 
+<!-- =============================================================================================================== -->
+                {% else %}
+                    <!-- Empty -->
+                {% endif %}
+                
+    
+            </div>
+            
+    </div>
+    
+    <div class="container2">
+        <p>
+            <!-- <h3>Bid block create</h3> -->
+            {% if not user.is_authenticated %}
+                Login for created bid !
+            {% elif currentlot.lot_status == True %}
+                <form id="createbid" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <p>
+                    <b>Bid:</b> <input type="number" name="bidprice" placeholder="$" form="createbid"> 
+                    <input type="hidden" name="userid" value="{{ user.id }}" form="createbid">  
+                </p>
+                <p>
+                    <button class="btn btn-primary" type="submit" form="createbid" name="createbid">Bid lot</button>
+                </p>
+                </form>
+            {% else %} 
+            Lot is closed
+            {% endif %}
+        </p>
+
+    </div>
+
+    <div class="bidlist">
+        <p>
+           <!-- <h3>Bid block bids list</h3> -->
+        </p>
+        {% for currentbid in currentbids %}
+        <p>
+            Bid: from {{ currentbid.bid_user }} $ {{ currentbid.bid_price }}
+        </p>
+        {% endfor %}
+
+    </div>
+
+    </div>
+
+    <div class="containercomment">
+          <!--<h3>Comment block</h3>-->  
+        <div id="commentlist">
+            {% for comment in comments %}
+                <span id="author">{{ comment.comment_user }}</span> 
+                <span class="date">({{ comment.comment_date }})</span>
+                {{ comment.comment_text|linebreaks }}
+        
+            {% endfor %}
+        </div>
+        <div class="addcomment">
+            {% if not user.is_authenticated %}
+            Login for add comment !
+        {% elif currentlot.lot_status == True %}
+            <form id="createcomment" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                <!-- <b>Comment:</b> -->
+                <textarea id="commenttext" placeholder="add comment" name="commenttext" form="createcomment"></textarea>
+                <input type="hidden" name="userid" value="{{ user.id }}" form="createcomment">  
+            </p>
+            <p>
+                <button class="btn btn-primary" type="submit" form="createcomment" name="createcomment">Add comment</button>
+            </p>
+            </form>
+        {% else %} 
+        Lot is closed
+        {% endif %}
+        </div>
+
+    </div>
+
+    </div>
+  
+    
+{% endblock %}
