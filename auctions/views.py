@@ -1,14 +1,33 @@
 from django.contrib.auth import authenticate, login, logout
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
-
+from .models import Bid, LotCategory, User, Lot, LotImage, Watchlist
+from .forms import LotImageForm
+import datetime
 
 def index(request):
-    return render(request, "auctions/index.html")
+    #print(f"{Lot.objects.all()}")
+    if request.method == "POST" and request.POST['category'] != "1":
+        category = request.POST['category']
+        #print(f"request={request.POST}")
+        #print(f"catr={category}")
+        return render(request, "auctions/index.html", {
+        "lots": Lot.objects.all().filter(lot_category=category).filter(lot_status=True).order_by('-id'),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all()
+        })
+    else:
+       # print(f"shalom")
+        return render(request, "auctions/index.html", {
+        "lots": Lot.objects.all().filter(lot_status=True).order_by('-id'),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all()
+    })
 
 
 def login_view(request):
@@ -161,3 +180,70 @@ def createlot(request):
         "categorylot": LotCategory.objects.all()
         })
 
+
+def watchlist(request, user_id):
+    print("watchlist work")
+    print(f"requestaaa={request.POST}")
+    #print(f"{Lot.objects.all()}")
+    if request.method == "POST" and "delwatchlist" in request.POST:
+         print("watchlist work if0")
+         print(f"requestbbb={request.POST}")
+         userid = request.POST['userid']
+         watchuser = User.objects.get(id=userid)
+         delwatchlist = request.POST['delwatchlist']
+         watchlist = Watchlist.objects.get(pk=delwatchlist)
+         print(f"delwatclist={delwatchlist}")
+         print(f"watchlistid={watchlist}")
+         watchlist.delete()
+         #currentid = request.POST['currentid']
+         #watchlotid = Lot.objects.get(id=currentid)
+         return render(request, "auctions/watchlist.html", {
+         "lotimages": LotImage.objects.all(),
+         "userinf": User.objects.all(),
+         "categorylot": LotCategory.objects.all(),
+         "watchlists": Watchlist.objects.all().filter(watch_user=watchuser).exclude(id=1)
+         })
+    elif request.method == "POST" and "addwatchlist" in request.POST:
+         print("watchlist work if1")
+         userid = request.POST['userid']
+         watchuser = User.objects.get(id=userid)
+         currentid = request.POST['currentid']
+         watchlotid = Lot.objects.get(id=currentid)
+         print(f"userid={userid}")
+         print(f"currentid={currentid}")
+         watchlist = Watchlist.objects.create(watch_user=watchuser, watch_lot_id=watchlotid)
+         watchlist.save()
+         return render(request, "auctions/watchlist.html", {
+         "lotimages": LotImage.objects.all(),
+         "userinf": User.objects.all(),
+         "categorylot": LotCategory.objects.all(),
+         "watchlists": Watchlist.objects.all().filter(watch_user=watchuser).exclude(id=1)
+         })
+    elif request.method == "POST" and request.POST['category'] != "1":
+        print("watchlist work if2")
+        category = request.POST['category']
+        print(f"requestwatch={request.POST}")
+        userid = request.POST['userid']
+        watchuser = User.objects.get(id=userid)
+        #print(f"catr={category}")
+        #print(f"watchlistcat={Watchlist.objects.all().filter(watch_lot_id__lot_category=category)}")
+        print(f"watchlistcat={Watchlist.objects.values_list('watch_lot_id__lot_category', flat=True).get(pk=1)}")
+        return render(request, "auctions/watchlist.html", {
+        "lots": Lot.objects.all().filter(lot_category=category),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all(),
+        "watchlists": Watchlist.objects.all().filter(watch_user=watchuser).filter(watch_lot_id__lot_category=category).exclude(id=1)
+        })
+    else:
+       # print(f"shalom")
+        print("watchlist work if3")
+        userid = user_id
+        watchuser = User.objects.get(id=userid)
+        return render(request, "auctions/watchlist.html", {
+        "lots": Lot.objects.all(),
+        "lotimages": LotImage.objects.all(),
+        "userinf": User.objects.all(),
+        "categorylot": LotCategory.objects.all(),
+        "watchlists": Watchlist.objects.all().filter(watch_user=watchuser).exclude(id=1)
+    })

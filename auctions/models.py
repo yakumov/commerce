@@ -5,19 +5,22 @@ from django.db import models
 class User(AbstractUser):
     pass
 
+
 class LotImage(models.Model):
     titleimage = models.CharField(max_length=64)
     lot_image = models.ImageField(upload_to='images/')
 
     def __str__(self):
         return f"{self.titleimage} ({self.id})" 
-#----------------------------------------------------------------------------------
+
+
 class LotCategory(models.Model):
     category = models.CharField(max_length=64)
 
     def __str__(self):
         return f"{self.category}" 
-#----------------------------------------------------------------------------------
+
+
 class Bid(models.Model):
     bid_user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     bid_price = models.IntegerField()
@@ -25,7 +28,8 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"{self.bid_user} ({self.bid_lot_id}) $ {self.bid_price}" 
-#----------------------------------------------------------------------------------
+
+
 class Lot(models.Model):
     lot_name = models.CharField(max_length=64)
     lot_price = models.IntegerField() 
@@ -41,3 +45,10 @@ class Lot(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.lot_name} and {self.lot_price} and {self.lot_description} and {self.lot_date} and {self.lot_author} and {self.lot_status} and {self.lot_category} and {self.lot_viewimage} and {self.lot_bid}"
+
+class Watchlist(models.Model):
+    watch_user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    watch_lot_id = models.ForeignKey(Lot, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return f"{self.watch_user} ({self.watch_lot_id})" 

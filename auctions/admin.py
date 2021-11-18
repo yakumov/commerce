@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Lot, LotImage, LotCategory, Bid
+from .models import User, Lot, LotImage, LotCategory, Bid, Watchlist
 
 # Register your models here.
 
@@ -13,5 +13,6 @@ admin.site.register(Lot, LotAdmin)
 admin.site.register(LotImage)
 admin.site.register(Bid)
 admin.site.register(LotCategory)
+admin.site.register(Watchlist)
 
 
